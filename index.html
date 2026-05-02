@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Square Shot</title>
+<style>
+body{margin:0;background:#000;overflow:hidden;touch-action:none}
+canvas{display:block}
+#u{position:fixed;top:0;width:100%;color:#fff;text-align:center;display:none;font-family:Arial}
+#xp{width:100%;height:6px;background:#111}
+#f{height:100%;background:#0f8;width:0%}
+#s{padding:6px;background:rgba(0,0,0,.7);font-size:14px}
+#sc{font-size:24px;color:#0af;font-weight:bold}
+#m{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;z-index:999}
+#b{font-size:20px;padding:15px 40px;background:#0af;border:0;border-radius:10px;color:#fff}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="u">
+<div id="xp"><div id="f"></div></div>
+<div id="s"><div id="sc">0</div>LVL <span id="lv">1</span> | HP: <span id="hp">100</span></div>
+</div>
+<div id="m">
+<h1 style="color:#0af;font-size:32px">SQUARE SHOT</h1>
+<p style="opacity:.7">Toque pra começar</p>
+<button id="b">JOGAR</button>
+</div>
+<script>
+let c=document.getElementById('c'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+let p,e=[],b=[],g=[],s=0,lv=1,xp=0,xn=5,on=0,t={a:0};
+
+// BOTÃO FUNCIONA NO CELULAR AGORA
+document.getElementById('b').addEventListener('touchstart',start);
+document.getElementById('b').addEventListener('click',start);
+
+function start(e){
+e.preventDefault();
+p={x:c.width/2,y:c.height/2,h:100,m:100,d:10};
+m.style.display='none';
+u.style.display='block';
+on=1;
+L();
+}
+
+function L(){
+if(!on)return;
+x.fillStyle='rgba(0,0,0,.3)';x.fillRect(0,0,c.width,c.height);
+if(t.a){let dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy);if(d>5){p.x+=dx/d*4;p.y+=dy/d*4}}
+if(Math.random()<.025)e.push({x:Math.random()*c.width,y:-20,h:1});
+if(e.length&&Math.random()<.07){let n=e[0],d=9999;for(let o of e){let q=Math.hypot(o.x-p.x,o.y-p.y);if(q<d){n=o;d=q}}let a=Math.atan2(n.y-p.y,n.x-p.x);b.push({x:p.x,y:p.y,vx:Math.cos(a)*8,vy:Math.sin(a)*8})}
+b=b.filter(u=>{u.x+=u.vx;u.y+=u.vy;x.fillStyle='#fa0';x.fillRect(u.x-2,u.y-2,4,4);return u.x>-10&&u.x<c.width+10});
+e=e.filter(o=>{let a=Math.atan2(p.y-o.y,p.x-o.x);o.x+=Math.cos(a)*1.2;o.y+=Math.sin(a)*1.2;for(let i=b.length-1;i>=0;i--)if(Math.abs(b[i].x-o.x)<15&&Math.abs(b[i].y-o.y)<15){b.splice(i,1);o.h-=p.d;if(o.h<=0){s+=10;g.push({x:o.x,y:o.y,l:600});sc.textContent=s;return 0}}if(Math.abs(o.x-p.x)<30&&Math.abs(o.y-p.y)<30){p.h-=12;hp.textContent=Math.max(0,~~p.h);if(p.h<=0){alert('Fim! Score:'+s);location.reload()}return 0}x.fillStyle='#f05';x.fillRect(o.x-15,o.y-15,30,30);return 1});
+g=g.filter(j=>{j.l--;if(j.l<=0)return 0;let d=Math.hypot(j.x-p.x,j.y-p.y);if(d<120){let a=Math.atan2(p.y-j.y,p.x-j.x);j.x+=Math.cos(a)*5;j.y+=Math.sin(a)*5}if(d<25){xp++;if(xp>=xn){xp=0;lv++;xn=~~(xn*1.4);p.d+=2;p.m+=10;p.h+=10;lv.textContent=lv}f.style.width=xp/xn*100+'%';return 0}x.fillStyle='#0f8';x.beginPath();x.arc(j.x,j.y,6,0,7);x.fill();return 1});
+x.fillStyle='#0af';x.fillRect(p.x-20,p.y-20,40,40);
+x.fillStyle='rgba(255,0,0,.3)';x.fillRect(p.x-20,p.y+25,40,4);
+x.fillStyle='#0f0';x.fillRect(p.x-20,p.y+25,40*(p.h/p.m),4);
+requestAnimationFrame(L)}
+c.ontouchstart=e=>{t.a=1;t.x=e.touches[0].clientX;t.y=e.touches[0].clientY};
+c.ontouchmove=e=>{t.x=e.touches[0].clientX;t.y=e.touches[0].clientY};
+c.ontouchend=()=>{t.a=0};
+onresize=()=>{c.width=innerWidth;c.height=innerHeight};
+</script>
+</body>
+  </html>
